@@ -18,15 +18,30 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-
-// your first API endpoint... 
-app.get("/api/hello", function (req, res) {
-  res.json({greeting: 'hello API'});
-});
-
-
-
 // listen for requests :)
 var listener = app.listen(process.env.PORT, function () {
   console.log('Your app is listening on port ' + listener.address().port);
+});
+
+// get date in Unix and UTC from the specified parameter
+app.get('/api/:inputDate', (req, res) => {
+  if (/^\d+$/.test(req.params.inputDate)) {
+     var date = new Date(req.params.inputDate * 1000);
+     date.setTime(date.getTime() / 1000);
+  } else {
+     var date = new Date(req.params.inputDate);
+  }
+  if (date.toUTCString() == "Invalid Date") {
+    res.json({error : "Invalid Date"});
+  } else {
+  res.json({unix: date.getTime(),
+           utc: date.toUTCString()});
+  }
+});
+
+// return current date and time if no parameter specified
+app.get('/api/', (req, res) => {
+  let currentTime = new Date();
+  res.json({unix: currentTime.getTime(),
+           utc: currentTime.toUTCString()});
 });
